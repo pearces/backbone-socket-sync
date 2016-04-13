@@ -1,2 +1,2 @@
 # backbone-socket-sync
-A client/server backbonejs model synchronization library using websockets
+A client/server backbone.js model synchronization library using websockets

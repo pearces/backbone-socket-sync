@@ -1,0 +1,17 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules
+
+# Temporary swap files
+*.swp
+
+# OS X DS_Store files
+.DS_Store
+
+# Build directories
+dist
+tmp
