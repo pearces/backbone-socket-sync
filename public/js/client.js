@@ -4,7 +4,6 @@
 global.app = global.app || {};
 
 // libraries
-var $ = require('jquery');
 var _ = require('underscore');
 var Backbone = require('backbone');
 
