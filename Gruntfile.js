@@ -26,10 +26,24 @@ module.exports = (grunt) => {
         }
       }
     },
+    clean: {
+      client: '<%= client.dist %>'
+    },
     browserify: {
       client: {
         src: '<%= client.src %>/*.js',
         dest: '<%= client.dist %>/client.js'
+      }
+    },
+    uglify: {
+      options: {
+        sourceMap: true,
+        sourceMapIncludeSources: true
+      },
+      client: {
+        files: {
+          '<%= browserify.client.dest %>': ['<%= browserify.client.dest %>']
+        }
       }
     }
   });
@@ -37,10 +51,14 @@ module.exports = (grunt) => {
   // import tasks
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // default tasks
   grunt.registerTask('default', [
     'jshint',
-    'browserify'
+    'clean',
+    'browserify',
+    'uglify'
   ]);
 };
