@@ -8,7 +8,12 @@ module.exports = (grunt) => {
       dist: 'public/dist'
     },
     jshint: {
-      files: ['Gruntfile.js', '/*.js', 'public/js/**/*.js'],
+      files: [
+        'Gruntfile.js',
+        '*.js',
+        'public/js/**/*.js',
+        'common/*.js'
+      ],
       options: {
         esversion: 6,
         globalstrict: true,
@@ -30,8 +35,13 @@ module.exports = (grunt) => {
       client: '<%= client.dist %>'
     },
     browserify: {
+      options: {
+        alias: {
+          'common/models': './common/models.js'
+        }
+      },
       client: {
-        src: '<%= client.src %>/*.js',
+        src: ['<%= client.src %>/*.js', 'common/*.js'],
         dest: '<%= client.dist %>/client.js'
       }
     },
