@@ -7,10 +7,12 @@ global.app = global.app || {};
 var _ = require('underscore');
 var Backbone = require('backbone');
 
-app.Models = require('common/models');
+var Models = app.Models = require('common/models');
 
 // socket instance
 app.socket = require('socket.io-client')('http://localhost:3000');
+
+app.model = new Models.SyncModel({}, { socket: app.socket });
 
 // export the app module
 module.export = app;

@@ -11,7 +11,7 @@ const Models = require('./common/models');
 app.use(express.static('public'));
 
 // create a test model
-let model = new Models.SyncModel();
+let model = new Models.SyncModel({}, { socket: io });
 
 // connection event handlers
 io.on('connection', (socket) => {

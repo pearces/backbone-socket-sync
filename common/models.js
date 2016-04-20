@@ -21,6 +21,9 @@ var sync = function(method, model, options) {
 
   var xhr = options.xhr = {}; //TODO: make a suitable replacement for Backbone.ajax(_.extend(params, options)) call
   model.trigger('request', model, xhr, options);
+
+  model.socket.emit.apply(model.socket, arguments);
+
   return xhr;
 };
 
@@ -33,12 +36,33 @@ var methodMap = {
 };
 
 Models.SyncModel = Backbone.Model.extend({
-  sync: sync
+  sync: sync,
+
+  initialize: function(attributes, options) {
+    options = options || {};
+
+    if (options.socket) {
+      this.socket = options.socket;
+    }
+
+    Backbone.Model.prototype.initialize.apply(this, arguments);
+  }
 });
 
 Models.SyncModels = Backbone.Collection.extend({
   model: Models.SyncModel,
-  sync: sync
+
+  sync: sync,
+
+  initialize: function(models, options) {
+    options = options || {};
+
+    if (options.socket) {
+      this.socket = options.socket;
+    }
+
+    Backbone.Collection.prototype.initialize.apply(this, arguments);
+  }
 });
 
 module.exports = Models;
