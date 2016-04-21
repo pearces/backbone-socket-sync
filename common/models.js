@@ -5,8 +5,9 @@ var Backbone = require('backbone');
 var Models = Models || {};
 
 var sync = function(method, model, options) {
-  var type = methodMap[method];
-  var params = { type: type };
+  var params = {},
+    xhr = {},
+    deferred = Backbone.$.Deferred();
 
   if ((!options.data || options.data === null) && model && (method === 'create' || method === 'update' || method === 'patch')) {
     params.data = JSON.stringify(options.attrs || model.toJSON(options));
@@ -19,20 +20,16 @@ var sync = function(method, model, options) {
     if (error) error.call(options.context, xhr, textStatus, errorThrown);
   };
 
-  var xhr = options.xhr = {}; //TODO: make a suitable replacement for Backbone.ajax(_.extend(params, options)) call
+  deferred.resolve(model.attributes);
+
+  model.socket.emit(method, Array.prototype.slice.call(arguments, 1));
+
+  //TODO: make a suitable replacement for Backbone.ajax(_.extend(params, options)) call
+  xhr = deferred.promise();
+
   model.trigger('request', model, xhr, options);
 
-  model.socket.emit.apply(model.socket, arguments);
-
   return xhr;
-};
-
-var methodMap = {
-  'create': 'POST',
-  'update': 'PUT',
-  'patch': 'PATCH',
-  'delete': 'DELETE',
-  'read': 'GET'
 };
 
 Models.SyncModel = Backbone.Model.extend({
