@@ -13,6 +13,7 @@ app.use(express.static('public'));
 // create a test model
 //let model = new Models.SyncModel({}, { socket: io });
 let model = new Backbone.Model();
+model.sync = () => {}; //TODO: provide an object-backed sync
 
 // connection event handlers
 io.on('connection', (socket) => {
@@ -23,7 +24,7 @@ io.on('connection', (socket) => {
   });
 
   const modelEvents = ['create', 'read', 'update', 'patch', 'delete'];
-  modelEvents.forEach(ev => socket.on(ev, (data) => model.sync(ev, data[0], data.slice(1)))); //TODO: make this work in a sync-less way
+  modelEvents.forEach(ev => socket.on(ev, (data) => model.sync.apply(Array.prototype.concat(ev, data)))); //TODO: make this work in a sync-less way
 });
 
 server.listen(3000, () => {
