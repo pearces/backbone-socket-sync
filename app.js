@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
   });
 
   const modelEvents = ['create', 'read', 'update', 'patch', 'delete'];
-  modelEvents.forEach(ev => socket.on(ev, (data) => model.sync.apply(Array.prototype.concat(ev, data)))); //TODO: make this work in a sync-less way
+  modelEvents.forEach(ev => socket.on(ev, (data) => model.sync.apply(model, Array.prototype.concat(ev, data)))); //TODO: make this work in a sync-less way
 });
 
 server.listen(3000, () => {
