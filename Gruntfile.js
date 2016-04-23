@@ -37,7 +37,8 @@ module.exports = (grunt) => {
     browserify: {
       options: {
         alias: {
-          'common/models': './common/models.js'
+          'common/models': './common/models.js',
+          'socket.io': 'socket.io-client'
         }
       },
       client: {

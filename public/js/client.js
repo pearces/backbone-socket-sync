@@ -10,7 +10,7 @@ var Backbone = require('backbone');
 var Models = app.Models = require('common/models');
 
 // socket instance
-app.socket = require('socket.io-client')('http://localhost:3000');
+app.socket = require('socket.io')('http://localhost:3000');
 
 app.model = new Models.SyncModel({}, { socket: app.socket });
 
