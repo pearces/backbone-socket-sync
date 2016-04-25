@@ -5,12 +5,37 @@ var Backbone = require('backbone');
 
 var Models = Models || {};
 
+var remoteSync = function(method, model, options, socket) {
+  var response = null;
+
+  switch (method) {
+    case 'create':
+      this.clear();
+      this.set(model);
+      break;
+    case 'read':
+      break;
+    case 'update':
+      break;
+    case 'patch':
+      break;
+    case 'delete':
+      break;
+  }
+
+  console.log(this);
+  socket.emit('success', response);
+};
+
 var attachListeners = function(socket) {
+  var model = this;
   var modelEvents = ['create', 'read', 'update', 'patch', 'delete'];
   socket = socket || this.socket;
 
   _.each(modelEvents, function(ev) {
-    socket.on(ev, function(data) { console.log(arguments); });
+    socket.on(ev, function(data) {
+      remoteSync.apply(model, data.concat(socket));
+    });
   });
 };
 
