@@ -11,15 +11,20 @@ var remoteSync = function(method, model, options, socket) {
   switch (method) {
     case 'create':
       this.clear();
-      this.set(model);
+      this.set(model); // set id too, otherwise every model.save is a create
       break;
     case 'read':
+      response = this.attributes; // get id too?
       break;
     case 'update':
+      this.clear();
+      this.set(model);
       break;
     case 'patch':
+      this.set(model);
       break;
     case 'delete':
+      this.destroy();
       break;
   }
 
