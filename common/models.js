@@ -29,7 +29,7 @@ var remoteSync = function(method, model, options, socket) {
   }
 
   console.log(this);
-  socket.emit('success', response);
+  socket.emit('response', response);
 };
 
 var attachListeners = function(socket) {
@@ -49,6 +49,8 @@ var sync = function(method, model, options) {
     xhr = {},
     deferred = Backbone.$.Deferred();
 
+  options = options || {};
+
   if ((!options.data || options.data === null) && model && (method === 'create' || method === 'update' || method === 'patch')) {
     params.data = JSON.stringify(options.attrs || model.toJSON(options));
   }
@@ -60,11 +62,16 @@ var sync = function(method, model, options) {
     if (error) error.call(options.context, xhr, textStatus, errorThrown);
   };
 
-  deferred.resolve(model.attributes);
+  model.socket.emit(method, Array.prototype.slice.call(arguments)).once('response', function handleResponse(response) {
+    if (response) {
+      if (options.success) {
+        options.success(response);
+      }
+      deferred.resolve(response);
+    }
+    //TODO: handle error, success, reject, complete
+  });
 
-  model.socket.emit(method, Array.prototype.slice.call(arguments));
-
-  //TODO: make a suitable replacement for Backbone.ajax(_.extend(params, options)) call
   xhr = deferred.promise();
 
   model.trigger('request', model, xhr, options);
