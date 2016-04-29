@@ -44,10 +44,25 @@ var attachListeners = function(socket) {
   });
 };
 
+var handleResponse = function(response, options, deferred) {
+  if (response) {
+    if (options.success) {
+      options.success(response);
+    }
+    deferred.resolve(response);
+  }
+
+  if (options.complete) {
+    options.complete(response);
+  }
+  //TODO: handle error, reject
+};
+
 var sync = function(method, model, options) {
   var params = {},
     xhr = {},
-    deferred = Backbone.$.Deferred();
+    deferred = Backbone.$.Deferred(),
+    handler = _.partial(handleResponse, _, options, deferred);
 
   options = options || {};
 
@@ -62,15 +77,7 @@ var sync = function(method, model, options) {
     if (error) error.call(options.context, xhr, textStatus, errorThrown);
   };
 
-  model.socket.emit(method, Array.prototype.slice.call(arguments)).once('response', function handleResponse(response) {
-    if (response) {
-      if (options.success) {
-        options.success(response);
-      }
-      deferred.resolve(response);
-    }
-    //TODO: handle error, success, reject, complete
-  });
+  model.socket.emit(method, Array.prototype.slice.call(arguments)).once('response', handler);
 
   xhr = deferred.promise();
 
