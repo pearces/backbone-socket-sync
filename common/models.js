@@ -44,7 +44,7 @@ var attachListeners = function(socket) {
   });
 };
 
-var handleResponse = function(response, options, deferred) {
+var handleResponse = function(response, model, error, options, deferred) {
   if (response) {
     if (options.success) {
       options.success(response);
@@ -52,30 +52,28 @@ var handleResponse = function(response, options, deferred) {
     deferred.resolve(response);
   }
 
+  if (error && options.error) {
+    options.error(model, error, options);
+  }
+
   if (options.complete) {
     options.complete(response);
   }
-  //TODO: handle error, reject
+  //TODO: handle reject
 };
 
 var sync = function(method, model, options) {
   var params = {},
     xhr = {},
     deferred = Backbone.$.Deferred(),
-    handler = _.partial(handleResponse, _, options, deferred);
+    error, //TODO: populate this
+    handler = _.partial(handleResponse, _, model, error, options, deferred);
 
   options = options || {};
 
   if ((!options.data || options.data === null) && model && (method === 'create' || method === 'update' || method === 'patch')) {
     params.data = JSON.stringify(options.attrs || model.toJSON(options));
   }
-
-  var error = options.error;
-  options.error = function(xhr, textStatus, errorThrown) {
-    options.textStatus = textStatus;
-    options.errorThrown = errorThrown;
-    if (error) error.call(options.context, xhr, textStatus, errorThrown);
-  };
 
   model.socket.emit(method, Array.prototype.slice.call(arguments)).once('response', handler);
 
