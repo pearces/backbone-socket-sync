@@ -8,27 +8,34 @@ var Models = Models || {};
 var remoteSync = function(method, model, options, socket) {
   var response = null;
 
-  switch (method) {
-    case 'create':
-      this.clear();
-      this.set(model); // set id too, otherwise every model.save is a create
-      break;
-    case 'read':
-      response = this.attributes; // get id too?
-      break;
-    case 'update':
-      this.clear();
-      this.set(model);
-      break;
-    case 'patch':
-      this.set(model);
-      break;
-    case 'delete':
-      this.destroy();
-      break;
+  try {
+    switch (method) {
+      case 'create':
+        this.clear();
+        this.set(model); // set id too, otherwise every model.save is a create
+        break;
+      case 'read':
+        response = this.attributes; // get id too?
+        break;
+      case 'update':
+        this.clear();
+        this.set(model);
+        break;
+      case 'patch':
+        this.set(model);
+        break;
+      case 'delete':
+        this.destroy();
+        break;
+    }
+  }
+  catch (error) {
+    response = {
+      name: error.name,
+      message: error.message
+    };
   }
 
-  console.log(this);
   socket.emit('response', response);
 };
 
@@ -44,30 +51,39 @@ var attachListeners = function(socket) {
   });
 };
 
+var isError = function(obj) {
+  return obj && obj.name && obj.message && obj.name === 'Error';
+};
+
 var handleResponse = function(response, model, error, options, deferred) {
-  if (response) {
+  var errorResponse = isError(response);
+
+  if (response && !errorResponse) {
     if (options.success) {
       options.success(response);
     }
     deferred.resolve(response);
   }
+  else if (error || errorResponse) {
+    error = error || response;
 
-  if (error && options.error) {
-    options.error(model, error, options);
+    if (options.error) {
+      options.error(model, error, options);
+    }
+    deferred.reject(error.message);
   }
 
   if (options.complete) {
     options.complete(response);
   }
-  //TODO: handle reject
 };
 
 var sync = function(method, model, options) {
   var params = {},
     xhr = {},
     deferred = Backbone.$.Deferred(),
-    error, //TODO: populate this
-    handler = _.partial(handleResponse, _, model, error, options, deferred);
+    handler = _.partial(handleResponse, _, model, null, options, deferred),
+    errorHandler = _.partial(handleResponse, null, model, _, options, deferred);
 
   options = options || {};
 
@@ -75,7 +91,12 @@ var sync = function(method, model, options) {
     params.data = JSON.stringify(options.attrs || model.toJSON(options));
   }
 
-  model.socket.emit(method, Array.prototype.slice.call(arguments)).once('response', handler);
+  try {
+    model.socket.emit(method, Array.prototype.slice.call(arguments)).once('response', handler);
+  }
+  catch (syncError) {
+    errorHandler(syncError);
+  }
 
   xhr = deferred.promise();
 
