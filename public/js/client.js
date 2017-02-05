@@ -12,7 +12,7 @@ import io from 'socket.io';
 app.Models = Models;
 
 // socket instance
-app.socket = io('http://localhost:3000');
+app.socket = io(':3000');
 
 app.model = new Models.SyncModel({}, { socket: app.socket });
 

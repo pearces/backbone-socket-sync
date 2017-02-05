@@ -44,7 +44,7 @@ const attachListeners = function(socket) {
   const modelEvents = ['create', 'read', 'update', 'patch', 'delete'];
   socket = socket || this.socket;
 
-  _.each(modelEvents, ev => {
+  modelEvents.forEach(ev => {
     socket.on(ev, data => {
       remoteSync.apply(model, data.concat(socket));
     });
