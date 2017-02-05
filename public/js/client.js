@@ -1,18 +1,20 @@
 'use strict';
 
 // global app instance
-global.app = global.app || {};
+let app = global.app = {};
 
 // libraries
-var _ = require('underscore');
-var Backbone = require('backbone');
+import _ from 'underscore';
+import Backbone from 'backbone';
+import Models from 'common/models';
+import io from 'socket.io';
 
-var Models = app.Models = require('common/models');
+app.Models = Models;
 
 // socket instance
-app.socket = require('socket.io')('http://localhost:3000');
+app.socket = io('http://localhost:3000');
 
 app.model = new Models.SyncModel({}, { socket: app.socket });
 
 // export the app module
-module.export = app;
+export default app;

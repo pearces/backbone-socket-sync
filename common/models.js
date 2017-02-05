@@ -1,12 +1,12 @@
 'use strict';
 
-var _ = require('underscore');
-var Backbone = require('backbone');
+import _ from 'underscore';
+import Backbone from 'backbone';
 
-var Models = Models || {};
+let Models = {};
 
-var remoteSync = function(method, model, options, socket) {
-  var response = null;
+const remoteSync = function(method, model, options, socket) {
+  let response = null;
 
   try {
     switch (method) {
@@ -39,24 +39,23 @@ var remoteSync = function(method, model, options, socket) {
   socket.emit('response', response);
 };
 
-var attachListeners = function(socket) {
-  var model = this;
-  var modelEvents = ['create', 'read', 'update', 'patch', 'delete'];
+const attachListeners = function(socket) {
+  let model = this;
+  const modelEvents = ['create', 'read', 'update', 'patch', 'delete'];
   socket = socket || this.socket;
 
-  _.each(modelEvents, function(ev) {
-    socket.on(ev, function(data) {
+  _.each(modelEvents, ev => {
+    socket.on(ev, data => {
       remoteSync.apply(model, data.concat(socket));
     });
   });
 };
 
-var isError = function(obj) {
-  return obj && obj.name && obj.message && obj.name === 'Error';
-};
+const isError = obj =>
+  obj && obj.name && obj.message && obj.name === 'Error';
 
-var handleResponse = function(response, model, error, options, deferred) {
-  var errorResponse = isError(response);
+const handleResponse = (response, model, error, options, deferred) => {
+  let errorResponse = isError(response);
 
   if (response && !errorResponse) {
     if (options.success) {
@@ -78,8 +77,8 @@ var handleResponse = function(response, model, error, options, deferred) {
   }
 };
 
-var sync = function(method, model, options) {
-  var params = {},
+const sync = function(method, model, options) {
+   let params = {},
     xhr = {},
     deferred = Backbone.$.Deferred(),
     handler = _.partial(handleResponse, _, model, null, options, deferred),
@@ -92,7 +91,7 @@ var sync = function(method, model, options) {
   }
 
   try {
-    model.socket.emit(method, Array.prototype.slice.call(arguments)).once('response', handler);
+    model.socket.emit(method, [...arguments]).once('response', handler);
   }
   catch (syncError) {
     errorHandler(syncError);
@@ -139,4 +138,8 @@ Models.SyncModels = Backbone.Collection.extend({
   }
 });
 
+//commonjs export
 module.exports = Models;
+
+//es6 module export
+export default Models;

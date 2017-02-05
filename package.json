@@ -22,6 +22,9 @@
     "underscore": ">=1.3.8"
   },
   "devDependencies": {
+    "babel-cli": "^6.22.2",
+    "babel-preset-es2015": "^6.22.0",
+    "babelify": "^7.3.0",
     "grunt": "^1.0.0",
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-clean": "^1.0.0",

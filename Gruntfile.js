@@ -39,7 +39,8 @@ module.exports = (grunt) => {
         alias: {
           'common/models': './common/models.js',
           'socket.io': 'socket.io-client'
-        }
+        },
+        transform: [['babelify', { presets: ["es2015"] }]]
       },
       client: {
         src: ['<%= client.src %>/*.js', 'common/*.js'],
