@@ -14,21 +14,30 @@
     "socket.io"
   ],
   "dependencies": {
-    "backbone": "~1.3.2",
-    "express": "^4.14.1",
     "jquery": "^2.2.4",
+    "underscore": ">=1.3.8",
+    "backbone": "~1.3.2",
     "socket.io": "^1.7.2",
-    "socket.io-client": "^1.7.2",
-    "underscore": ">=1.3.8"
+    "socket.io-client": "^1.7.2"
   },
   "devDependencies": {
-    "babel-cli": "^6.22.2",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.22.0",
     "babel-preset-es2015": "^6.22.0",
     "babelify": "^7.3.0",
     "grunt": "^1.0.0",
     "grunt-browserify": "^5.0.0",
+    "grunt-babel": "^6.0.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-jshint": "^1.1.0",
-    "grunt-contrib-uglify": "^2.0.0"
-  }
+    "grunt-contrib-uglify": "^2.0.0",
+    "express": "^4.14.1"
+  },
+  "main": "sync-models.js",
+  "files": [
+    "sync-models.js",
+    "sync-models-client.js",
+    "sync-models-client.min.js",
+    "sync-models-client.min.js.map",
+    "lib/"
+  ]
 }
