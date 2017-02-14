@@ -72,14 +72,19 @@ var handleResponse = function handleResponse(response, model, error, options, de
     if (options.success) {
       options.success(response);
     }
-    deferred.resolve(response);
+    if (deferred) {
+      deferred.resolve(response);
+    }
   } else if (error || errorResponse) {
     error = error || response;
 
     if (options.error) {
       options.error(model, error, options);
     }
-    deferred.reject(error.message);
+
+    if (deferred) {
+      deferred.reject(error.message);
+    }
   }
 
   if (options.complete) {
@@ -90,7 +95,7 @@ var handleResponse = function handleResponse(response, model, error, options, de
 var sync = function sync(method, model, options) {
   var params = {},
       xhr = {},
-      deferred = _backbone2.default.$.Deferred(),
+      deferred = _backbone2.default.$.Deferred && _backbone2.default.$.Deferred(),
       handler = _underscore2.default.partial(handleResponse, _underscore2.default, model, null, options, deferred),
       errorHandler = _underscore2.default.partial(handleResponse, null, model, _underscore2.default, options, deferred);
 
@@ -106,7 +111,9 @@ var sync = function sync(method, model, options) {
     errorHandler(syncError);
   }
 
-  xhr = deferred.promise();
+  if (deferred) {
+    xhr = deferred.promise();
+  }
 
   model.trigger('request', model, xhr, options);
 
