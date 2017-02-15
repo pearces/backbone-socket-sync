@@ -30,7 +30,9 @@
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-jshint": "^1.1.0",
     "grunt-contrib-uglify": "^2.0.0",
-    "express": "^4.14.1"
+    "express": "^4.14.1",
+    "grunt-mocha-test": "^0.13.2",
+    "mocha": "^3.2.0"
   },
   "main": "sync-models.js",
   "files": [
@@ -39,5 +41,9 @@
     "sync-models-client.min.js",
     "sync-models-client.min.js.map",
     "lib/"
-  ]
+  ],
+  "scripts": {
+    "build": "./node_modules/.bin/grunt",
+    "test": "./node_modules/.bin/grunt test"
+  }
 }

@@ -5,7 +5,8 @@ module.exports = (grunt) => {
     jshint: {
       files: [
         'Gruntfile.js',
-        'lib/*.js'
+        'lib/*.js',
+        'test/*.js'
       ],
       options: {
         esversion: 6,
@@ -58,6 +59,15 @@ module.exports = (grunt) => {
           'sync-models-client.min.js': 'sync-models-client.js'
         }
       }
+    },
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec',
+          noFail: false
+        },
+        src: 'test/*.js'
+      }
     }
   });
 
@@ -67,6 +77,7 @@ module.exports = (grunt) => {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks("grunt-browserify");
   grunt.loadNpmTasks('grunt-babel');
+  grunt.loadNpmTasks('grunt-mocha-test');
 
   // default tasks
   grunt.registerTask('default', [
@@ -76,4 +87,6 @@ module.exports = (grunt) => {
     'babel',
     'uglify'
   ]);
+
+  grunt.registerTask('test', 'mochaTest');
 };
