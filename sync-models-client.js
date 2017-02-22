@@ -42,14 +42,15 @@ var remoteSync = function remoteSync(method, model, options, socket) {
     switch (method) {
       case 'create':
         this.clear();
-        this.set(model); // set id too, otherwise every model.save is a create
+        this.set(model);
         break;
       case 'read':
-        response = this.attributes; // get id too?
+        response = _underscore2.default.extend({ id: this.id }, this.attributes);
         break;
       case 'update':
         this.clear();
         this.set(model);
+        response = this.attributes;
         break;
       case 'patch':
         this.set(model);
@@ -68,10 +69,11 @@ var remoteSync = function remoteSync(method, model, options, socket) {
   socket.emit('response', response);
 };
 
-var attachListeners = function attachListeners(socket) {
+var attachListeners = function attachListeners() {
+  var socket = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.socket;
+
   var model = this;
   var modelEvents = ['create', 'read', 'update', 'patch', 'delete'];
-  socket = socket || this.socket;
 
   modelEvents.forEach(function (ev) {
     socket.on(ev, function (data) {
@@ -111,14 +113,14 @@ var handleResponse = function handleResponse(response, model, error, options, de
   }
 };
 
-var sync = function sync(method, model, options) {
+var sync = function sync(method, model) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
   var params = {},
       xhr = {},
       deferred = _backbone2.default.$.Deferred && _backbone2.default.$.Deferred(),
       handler = _underscore2.default.partial(handleResponse, _underscore2.default, model, null, options, deferred),
       errorHandler = _underscore2.default.partial(handleResponse, null, model, _underscore2.default, options, deferred);
-
-  options = options || {};
 
   if ((!options.data || options.data === null) && model && (method === 'create' || method === 'update' || method === 'patch')) {
     params.data = JSON.stringify(options.attrs || model.toJSON(options));
@@ -139,16 +141,26 @@ var sync = function sync(method, model, options) {
   return xhr;
 };
 
+var id = function id() {
+  return Math.random().toString(36).substr(2, 9);
+};
+
 Models.SyncModel = _backbone2.default.Model.extend({
   sync: sync,
   attachListeners: attachListeners,
 
-  initialize: function initialize(attributes, options) {
-    options = options || {};
+  initialize: function initialize() {
+    var attributes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     if (options.socket) {
       this.socket = options.socket;
       this.attachListeners();
+    }
+
+    // set the id if it isn't in the attributes and doesn't yet exist
+    if (!attributes.id && !this.id) {
+      this.id = id();
     }
 
     _backbone2.default.Model.prototype.initialize.apply(this, arguments);
@@ -161,8 +173,9 @@ Models.SyncModels = _backbone2.default.Collection.extend({
 
   sync: sync,
 
-  initialize: function initialize(models, options) {
-    options = options || {};
+  initialize: function initialize(models) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
 
     if (options.socket) {
       this.socket = options.socket;

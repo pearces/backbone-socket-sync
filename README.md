@@ -9,17 +9,13 @@ Get the source:
 ```shell
 git clone git://github.com/pearces/backbone-socket-sync.git
 ```
-Install grunt 1.0.x or higher and grunt-cli if it is not present on your system (check with grunt -V):
-```
-npm install -g grunt-cli
-```
 Enter the repo directory and download the build and runtime dependencies:
 ```shell
 cd backbone-socket-sync && npm install
 ```
 Build the npm with grunt into the root directory:
 ```shell
-grunt
+npm run build
 ```
 
 Generated Assets

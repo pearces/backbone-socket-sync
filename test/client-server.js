@@ -5,7 +5,7 @@ const io = require('socket.io')(server);
 const Models = require('../sync-models');
 const ioClient = require('socket.io-client');
 const assert = require('assert');
-
+const _ = require('underscore');
 
 let serverModel, clientModel;
 
@@ -41,7 +41,22 @@ describe('Client-server tests', () => {
   it('client should get server model attributes', done => {
     clientModel.fetch({
       success: (model, response, options) => {
-        // check the client attributes against the server model
+        // check the client attributes against the server model (excluding the id)
+        assert.equal(JSON.stringify(_.omit(model.attributes, 'id')), JSON.stringify(serverModel.attributes));
+        done();
+      },
+      error: (model, response, options) => {
+        done(response);
+      }
+    });
+  });
+
+  it('server should get changed client attributes', done => {
+    const data = Object.assign({ bar: 2 }, clientModel.attributes);
+
+    clientModel.save(data, {
+      success: (model, response, options) => {
+        // check the server attributes against the client model
         assert.equal(JSON.stringify(model.attributes), JSON.stringify(serverModel.attributes));
         done();
       },
