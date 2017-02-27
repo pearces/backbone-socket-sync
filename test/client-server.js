@@ -52,12 +52,27 @@ describe('Client-server tests', () => {
   });
 
   it('server should get changed client attributes', done => {
-    const data = Object.assign({ bar: 2 }, clientModel.attributes);
+    const data = { bar: 2 };
 
     clientModel.save(data, {
       success: (model, response, options) => {
         // check the server attributes against the client model
         assert.equal(JSON.stringify(model.attributes), JSON.stringify(serverModel.attributes));
+        done();
+      },
+      error: (model, response, options) => {
+        done(response);
+      }
+    });
+  });
+
+  it('client should get changed server attributes', done => {
+    const data = { thing: 3 };
+
+    serverModel.save(data, {
+      success: (model, response, options) => {
+        // check the client attributes against the server model
+        assert.equal(JSON.stringify(model.attributes), JSON.stringify(clientModel.attributes));
         done();
       },
       error: (model, response, options) => {
