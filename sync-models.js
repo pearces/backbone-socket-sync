@@ -24,9 +24,10 @@ var remoteSync = function remoteSync(method, model, options, socket) {
       case 'create':
         this.clear();
         this.set(model);
+        response = this.attributes;
         break;
       case 'read':
-        response = _underscore2.default.extend({ id: this.id }, this.attributes);
+        response = _underscore2.default.extend(this.idAttribute ? {} : { id: this.id }, this.attributes);
         break;
       case 'update':
         this.clear();
@@ -35,6 +36,7 @@ var remoteSync = function remoteSync(method, model, options, socket) {
         break;
       case 'patch':
         this.set(model);
+        response = this.attributes;
         break;
       case 'delete':
         this.destroy();
@@ -136,7 +138,7 @@ Models.SyncModel = _backbone2.default.Model.extend({
     }
 
     // set the id if it isn't in the attributes and doesn't yet exist
-    if (!attributes.id && !this.id) {
+    if (!attributes.idAttribute && !attributes.id && !this.id) {
       this.id = id();
     }
 

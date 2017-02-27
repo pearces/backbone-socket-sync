@@ -29,13 +29,20 @@ before(done => {
   });
 });
 
+// compare the attributes of two models and assert whether they are the same
+const compareModels = (...models) =>
+  assert.equal(...models.map(model =>
+    JSON.stringify(model.attributes)
+  )
+);
+
 describe('Client-server tests', () => {
   it('should set a value on the server model', () => {
     // create some test data and set it on the server model
     const data = { foo: 1 };
     serverModel.set(data);
 
-    return assert.equal(JSON.stringify(serverModel.attributes), JSON.stringify(data));
+    assert.equal(JSON.stringify(serverModel.attributes), JSON.stringify(data));
   });
 
   it('client should get server model attributes', done => {
@@ -57,7 +64,7 @@ describe('Client-server tests', () => {
     clientModel.save(data, {
       success: (model, response, options) => {
         // check the server attributes against the client model
-        assert.equal(JSON.stringify(model.attributes), JSON.stringify(serverModel.attributes));
+        compareModels(model, serverModel);
         done();
       },
       error: (model, response, options) => {
@@ -72,7 +79,50 @@ describe('Client-server tests', () => {
     serverModel.save(data, {
       success: (model, response, options) => {
         // check the client attributes against the server model
-        assert.equal(JSON.stringify(model.attributes), JSON.stringify(clientModel.attributes));
+        compareModels(model, clientModel);
+        done();
+      },
+      error: (model, response, options) => {
+        done(response);
+      }
+    });
+  });
+
+  it('server should get patched attributes from client', done => {
+    const data = { patched: true };
+
+    clientModel.save(data, {
+      patch: true,
+      success: (model, response, options) => {
+        // check the server attributes against the client model
+        compareModels(model, serverModel);
+        done();
+      },
+      error: (model, response, options) => {
+        done(response);
+      }
+    });
+  });
+
+  it('server should get cleared attributes from client', done => {
+    clientModel.clear();
+    clientModel.save({}, {
+      success: (model, response, options) => {
+        // check the server attributes against the client model
+        compareModels(model, serverModel);
+        done();
+      },
+      error: (model, response, options) => {
+        done(response);
+      }
+    });
+  });
+
+  it('server should delete model when destroyed on the client', done => {
+    clientModel.destroy({
+      success: (model, response, options) => {
+        // check the server attributes against the client model
+        compareModels(model, serverModel);
         done();
       },
       error: (model, response, options) => {
