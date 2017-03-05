@@ -27,7 +27,13 @@ var remoteSync = function remoteSync(method, model, options, socket) {
         response = this.attributes;
         break;
       case 'read':
-        response = _underscore2.default.extend(this.idAttribute ? {} : { id: this.id }, this.attributes);
+        if (this instanceof Models.SyncModel) {
+          response = _underscore2.default.extend(this.idAttribute ? {} : { id: this.id }, this.attributes);
+        } else {
+          response = this.models.map(function (model) {
+            return model.attributes;
+          });
+        }
         break;
       case 'update':
         this.clear();
@@ -155,10 +161,8 @@ Models.SyncModels = _backbone2.default.Collection.extend({
   initialize: function initialize(models) {
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-
     if (options.socket) {
-      this.socket = options.socket;
-      this.attachListeners();
+      this.attachListeners(options.socket);
     }
 
     _backbone2.default.Collection.prototype.initialize.apply(this, arguments);

@@ -5,12 +5,15 @@
 var Models = require('./models');
 var io = require('socket.io-client');
 
-// export Models if node or Models, socket.io to global (window) object if in a browser
+// export Models if in node or browserify
 if (typeof exports !== 'undefined') {
   if (typeof module !== 'undefined' && module.exports) {
     exports = module.exports = Models;
   }
-} else {
+}
+
+// export Models, socket.io to global (window) object if in a browser
+if (typeof window !== 'undefined') {
   global.Models = Models;
   global.io = io;
 }
@@ -46,7 +49,13 @@ var remoteSync = function remoteSync(method, model, options, socket) {
         response = this.attributes;
         break;
       case 'read':
-        response = _underscore2.default.extend(this.idAttribute ? {} : { id: this.id }, this.attributes);
+        if (this instanceof Models.SyncModel) {
+          response = _underscore2.default.extend(this.idAttribute ? {} : { id: this.id }, this.attributes);
+        } else {
+          response = this.models.map(function (model) {
+            return model.attributes;
+          });
+        }
         break;
       case 'update':
         this.clear();
@@ -174,10 +183,8 @@ Models.SyncModels = _backbone2.default.Collection.extend({
   initialize: function initialize(models) {
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-
     if (options.socket) {
-      this.socket = options.socket;
-      this.attachListeners();
+      this.attachListeners(options.socket);
     }
 
     _backbone2.default.Collection.prototype.initialize.apply(this, arguments);
